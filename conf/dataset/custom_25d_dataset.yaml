@@ -1,0 +1,72 @@
+train:
+  name: custom_25d_dataset
+  data_path : "/home/ddl/git/kaggle-template/data/voxel_256x256/train"
+  nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
+  dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
+  label_dir : "/home/ddl/git/kaggle-template/train_labels_wfold.csv"
+  save_data_path: "/home/ddl/git/kaggle-template/data"
+  output_type: "25D"
+  mri_types: ["FLAIR",  "T2w"]  #,'T1w' 
+  label_name : MGMT_value
+  patient_id : BraTS21ID
+  drop_last: True
+  partition: 10 # Dataset save split number
+  batch_size: 16
+  flag_index: [0,1,2,3]  # list of flag indices or index which indicates train dataset
+  N_sample: 20
+  dicom_train: True
+  preprocess:
+    - type: resize
+      params:
+        size: 192
+    - type: tensor
+
+
+valid:
+  name: custom_25d_dataset
+  nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
+  dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
+  data_path : "/home/ddl/git/kaggle-template/data/voxel_256x256/train"
+  label_dir : "/home/ddl/git/kaggle-template/train_labels_wfold.csv"
+  save_data_path: "/home/ddl/git/kaggle-template/data"
+  output_type: "25D"
+  mri_types: ["FLAIR",  "T2w"]  #,'T1w' 
+  label_name : MGMT_value
+  patient_id : BraTS21ID
+  partition: 10 # Dataset save split number
+  batch_size: 16
+  flag_index: [4] 
+  drop_last: True 
+  N_sample: 20
+  dicom_train: True
+  preprocess:
+    - type: resize
+      params:
+        size: 192
+    - type: tensor
+
+test:
+  name: custom_25d_dataset
+  nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
+  dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
+  data_path : "/home/ddl/git/kaggle-template/data/voxel_256x256/train"
+  label_dir : "/home/ddl/git/kaggle-template/sample_submission.csv"
+  save_data_path: "/home/ddl/git/kaggle-template/data"
+  output_type: "25D"
+  mri_types: ["FLAIR",  "T2w"]  #,'T1w' 
+  label_name : MGMT_value
+  patient_id : BraTS21ID
+  partition: 10 # Dataset save split number
+  N_sample: 1
+  dicom_train: True
+  drop_last: True
+  batch_size: 16
+  preprocess:
+    - type: resize
+      params:
+        size: 192
+    - type: tensor
+    # - type: normalize
+    #   params:
+    #     mean: [0.5]
+    #     std: [0.5]
