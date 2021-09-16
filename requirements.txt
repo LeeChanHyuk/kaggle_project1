@@ -5,3 +5,10 @@ tqdm
 pandas
 tensorboard
 seaborn
+efficientnet_pytorch
+timm
+pydicom
+nibabel
+SimpleITK
+nilearn
+git+https://github.com/albumentations-team/albumentations

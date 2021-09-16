@@ -1,10 +1,10 @@
 train:
   name: custom_25d_dataset
-  data_path : "/home/ddl/git/kaggle-template/data/voxel_256x256/train"
+  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/data/voxel_128x128/train"
   nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
   dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
-  label_dir : "/home/ddl/git/kaggle-template/train_labels_wfold.csv"
-  save_data_path: "/home/ddl/git/kaggle-template/data"
+  label_dir : "/content/drive/My Drive/kaggle_project1/train_labels_wfold.csv"
+  save_data_path: "/content/drive/My Drive/kaggle_project1"
   output_type: "25D"
   mri_types: ["FLAIR",  "T2w"]  #,'T1w' 
   label_name : MGMT_value
@@ -26,9 +26,9 @@ valid:
   name: custom_25d_dataset
   nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
   dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
-  data_path : "/home/ddl/git/kaggle-template/data/voxel_256x256/train"
-  label_dir : "/home/ddl/git/kaggle-template/train_labels_wfold.csv"
-  save_data_path: "/home/ddl/git/kaggle-template/data"
+  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/data/voxel_128x128/train"
+  label_dir : "/content/drive/My Drive/kaggle_project1/train_labels_wfold.csv"
+  save_data_path: "/content/drive/My Drive/kaggle_project1"
   output_type: "25D"
   mri_types: ["FLAIR",  "T2w"]  #,'T1w' 
   label_name : MGMT_value
@@ -49,9 +49,9 @@ test:
   name: custom_25d_dataset
   nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
   dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
-  data_path : "/home/ddl/git/kaggle-template/data/voxel_256x256/train"
-  label_dir : "/home/ddl/git/kaggle-template/sample_submission.csv"
-  save_data_path: "/home/ddl/git/kaggle-template/data"
+  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/data/voxel_128x128/train"
+  label_dir : "/content/drive/My Drive/kaggle_project1/train_labels_wfold.csv"
+  save_data_path: "/content/drive/My Drive/kaggle_project1"
   output_type: "25D"
   mri_types: ["FLAIR",  "T2w"]  #,'T1w' 
   label_name : MGMT_value

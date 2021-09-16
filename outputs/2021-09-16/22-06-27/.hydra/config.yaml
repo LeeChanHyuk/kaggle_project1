@@ -1,0 +1,126 @@
+log:
+  type: tensorboard
+  version: board
+  save_parameter: true
+  log_graph: true
+  add_histogram: true
+  on_step: true
+architecture:
+  type: efficientv2/L
+dataset:
+  train:
+    name: custom_25d_dataset
+    data_path: dataset/task2/data/voxel_256x256/train
+    nibabel_path: /home/ddl/다운로드/data_original/task1/dataset
+    dicom_path: /home/ddl/다운로드/data_original/task2/dataset/train
+    label_dir: train_labels_wfold.csv
+    save_data_path: ../dataset
+    output_type: 25D
+    mri_types:
+    - FLAIR
+    - T2w
+    label_name: MGMT_value
+    patient_id: BraTS21ID
+    drop_last: true
+    partition: 10
+    batch_size: 16
+    flag_index:
+    - 0
+    - 1
+    - 2
+    - 3
+    N_sample: 20
+    dicom_train: true
+    preprocess:
+    - type: resize
+      params:
+        size: 192
+    - type: tensor
+  valid:
+    name: custom_25d_dataset
+    nibabel_path: /home/ddl/다운로드/data_original/task1/dataset
+    dicom_path: /home/ddl/다운로드/data_original/task2/dataset/train
+    data_path: dataset/task2/data/voxel_256x256/train
+    label_dir: train_labels_wfold.csv
+    save_data_path: /home/ddl/git/kaggle-template/data
+    output_type: 25D
+    mri_types:
+    - FLAIR
+    - T2w
+    label_name: MGMT_value
+    patient_id: BraTS21ID
+    partition: 10
+    batch_size: 16
+    flag_index:
+    - 4
+    drop_last: true
+    N_sample: 20
+    dicom_train: true
+    preprocess:
+    - type: resize
+      params:
+        size: 192
+    - type: tensor
+  test:
+    name: custom_25d_dataset
+    nibabel_path: /home/ddl/다운로드/data_original/task1/dataset
+    dicom_path: /home/ddl/다운로드/data_original/task2/dataset/train
+    data_path: dataset/task2/data/voxel_256x256/train
+    label_dir: sample_submission.csv
+    save_data_path: ../dataset
+    output_type: 25D
+    mri_types:
+    - FLAIR
+    - T2w
+    label_name: MGMT_value
+    patient_id: BraTS21ID
+    partition: 10
+    N_sample: 1
+    dicom_train: true
+    drop_last: true
+    batch_size: 16
+    preprocess:
+    - type: resize
+      params:
+        size: 192
+    - type: tensor
+loss:
+  type: bce
+optimizer:
+  type: adam
+  params:
+    lr: 1.0e-05
+    weight_decay: 0.0001
+hyperparameter:
+  batch_size: 8
+  epochs: 50
+  lr: 0.001
+scheduler:
+  warmup:
+    status: true
+    params:
+      multiplier: 1
+      total_epoch: 10
+  type: CosineAnnealingLR
+  params:
+    T_max: ???
+saver:
+  name: default_saver
+  top_k: 10
+  save_interval: 10
+  standard: metric
+  checkpoint_save_path: ./checkpoint/
+  top_save_path: ./checkpoint/top/
+  checkpoint_save_prefix: checkpoint
+base:
+  world_size: 1
+  use_amp: false
+  mode: train_eval
+  env:
+    mode: gpu
+  seed: '0xC0FFEE'
+  save_dir: ./test
+  resume: false
+  debug: true
+MASTER_ADDR: 127.0.0.3
+MASTER_PORT: '9095'

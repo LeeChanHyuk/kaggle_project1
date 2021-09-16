@@ -51,9 +51,9 @@ def create(conf, world_size=1, local_rank=-1, mode='train'):
     elif conf['name'] == 'custom_25d_dataset': 
         label_dir = conf['label_dir']
         if conf['dicom_train']:
-            label_dir_name, extension = label_dir.split('.')
-            label_dir_name += '_dicom'
-            label_dir = label_dir_name + '.' + extension
+            label_dir = label_dir[0:len(label_dir)-4]
+            label_dir += '_dicom.csv'
+        
         df = pd.read_csv(label_dir)
         
         # df = df[~df[conf['patient_id']].isin([109,123,709])]
