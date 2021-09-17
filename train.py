@@ -91,12 +91,14 @@ class Trainer():
     # TODO: modulizaing
     def build_dataloader(self, ):
 
+        print('Loading train_loader')
         train_loader, train_sampler, channel_length = trainer.dataset.create(
             self.conf.dataset,
             world_size=self.conf.base.world_size,
             local_rank=self.rank,
             mode='train'
         )
+        print('Loading valid_loader')
         valid_loader, valid_sampler, channel_length = trainer.dataset.create(
             self.conf.dataset,
             world_size=self.conf.base.world_size,
@@ -104,6 +106,7 @@ class Trainer():
             mode='valid'
         )
 
+        print('Loading test_loader')
         test_loader, test_sampler, channel_length = trainer.dataset.create(
             self.conf.dataset,
             world_size=self.conf.base.world_size,
@@ -291,7 +294,7 @@ class Trainer():
 
         # add graph to tensorboard
         if logger is not None:
-            logger.update_graph(model, torch.rand((1,106,192,192)).float())
+            logger.update_graph(model, torch.rand((1,66,192,192)).float())
 
         # load checkpoint
         if self.conf.base.resume == True:
@@ -339,6 +342,7 @@ def set_seed(conf):
 def runner(rank, conf):
     # Set Seed
     set_seed(conf)
+    print(os.getcwd())
 
     os.environ['MASTER_ADDR'] = conf.MASTER_ADDR
     os.environ['MASTER_PORT'] = conf.MASTER_PORT
@@ -353,7 +357,7 @@ def runner(rank, conf):
 
 
 
-@hydra.main(config_path='conf', config_name='cmpark')
+@hydra.main(config_path='conf', config_name='mine')
 def main(conf: DictConfig) -> None:
     print(f'Configuration\n{OmegaConf.to_yaml(conf)}')
     

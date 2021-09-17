@@ -1,6 +1,6 @@
 train:
   name: custom_25d_dataset
-  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/data/voxel_128x128/train"
+  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/voxel_128x128/train"
   nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
   dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
   label_dir : "/content/drive/My Drive/kaggle_project1/train_labels_wfold.csv"
@@ -26,7 +26,7 @@ valid:
   name: custom_25d_dataset
   nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
   dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
-  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/data/voxel_128x128/train"
+  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/voxel_128x128/train"
   label_dir : "/content/drive/My Drive/kaggle_project1/train_labels_wfold.csv"
   save_data_path: "/content/drive/My Drive/kaggle_project1"
   output_type: "25D"
@@ -49,7 +49,7 @@ test:
   name: custom_25d_dataset
   nibabel_path: "/home/ddl/다운로드/data_original/task1/dataset"
   dicom_path: "/home/ddl/다운로드/data_original/task2/dataset/train"
-  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/data/voxel_128x128/train"
+  data_path : "/content/drive/My Drive/kaggle_project1/dataset/task2/voxel_128x128/train"
   label_dir : "/content/drive/My Drive/kaggle_project1/train_labels_wfold.csv"
   save_data_path: "/content/drive/My Drive/kaggle_project1"
   output_type: "25D"

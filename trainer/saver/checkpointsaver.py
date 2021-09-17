@@ -4,6 +4,7 @@ import glob
 import operator
 import logging
 import os
+import pdb
 
 import torch
 import torch.distributed as dist
@@ -31,10 +32,11 @@ class CheckpointSaver:
         self.best_loss = None
 
         # config
-        self.checkpoint_dir = conf['checkpoint_save_path']
-        self.top_save_path = conf['top_save_path']
+        self.time_path = os.getcwd()
+        self.checkpoint_dir = os.path.join(self.time_path, conf['checkpoint_save_path'])
         self.date_path = '/'.join(list(os.getcwd().split('/'))[0:-1])
-        self.load_dir = os.path.join(self.date_path, 'load')
+        self.top_save_path = os.path.join(self.time_path, conf['top_save_path'])
+        self.load_dir = os.path.join('/'.join(list(os.getcwd().split('/'))[0:-1]), 'load')
         self.save_prefix = conf['checkpoint_save_prefix']
         self.extension = '.pth.tar'
         self.increasing = False if conf['standard'] == 'metric' else True  # a lower metric is better if True
@@ -93,25 +95,26 @@ class CheckpointSaver:
                 # delete last checkpoint
                 if len(self.checkpoint_files) > self.max_history:
                     for file in os.listdir(self.top_save_path):
-                        if self.checkpoint_files[self.max_history][0].split('/')[2] in file:
+                        if self.checkpoint_files[self.max_history][0].split('/')[-1] in file:
                             os.remove(os.path.join(self.top_save_path, file))
                     self.checkpoint_files.pop()
-
-
+                print('top')
+                print(self.top_save_path)
+                print(self.checkpoint_files)
                 # check the existness of the top checkpoint
                 for i in range(len(self.checkpoint_files)):
                     # file exist flag
                     exist_flag = False
                     for file in os.listdir(self.top_save_path):
-                        if self.checkpoint_files[i][0].split('/')[2] in file:
+                        if self.checkpoint_files[i][0].split('/')[-1] in file:
                             os.rename(os.path.join(self.top_save_path, file), 
-                            os.path.join(self.top_save_path, str(i+1).zfill(3)+'st_'+self.checkpoint_files[i][0].split('/')[2]))
+                            os.path.join(self.top_save_path, str(i+1).zfill(3)+'st_'+self.checkpoint_files[i][0].split('/')[-1]))
                             exist_flag=True
                             break
 
                     # if file doesn't exist in top_folder
                     if not exist_flag:
-                        self._save(os.path.join(self.top_save_path, str(i+1).zfill(3)+'st_'+self.checkpoint_files[i][0].split('/')[2]),
+                        self._save(os.path.join(self.top_save_path, str(i+1).zfill(3)+'st_'+self.checkpoint_files[i][0].split('/')[-1]),
                         epoch, loss,metric)
 
                 if self.best_metric is None or self.cmp(metric, self.best_metric):
@@ -147,7 +150,7 @@ class CheckpointSaver:
 
         # define the loading path
         if len(os.listdir(self.load_dir)) > 0:
-            top_dir = os.path.join(self.load_dir,self.top_save_path[2:])
+            top_dir = os.path.join(self.load_dir, 'top')
             top_save_path = os.path.join(top_dir, sorted(os.listdir(top_dir))[0])
         else:
             tmp_dir = os.listdir(self.date_path)
@@ -160,8 +163,11 @@ class CheckpointSaver:
             while len(os.listdir(self.date_path))>1:
                 # if the last date folder doesn't have checkpoint
                 try:
-                    last_top_dir = os.path.join(self.date_path,sorted(date_dir)[-2 + date_offset], self.top_save_path[2:])
-                    top_save_path = os.path.join(last_top_dir,sorted(os.listdir(last_top_dir))[0])
+                    last_checkpoint_path = os.path.join(self.date_path,sorted(date_dir)[-2 + date_offset], 'checkpoint')
+                    print('last checkpoint path = ', last_checkpoint_path)
+                    last_checkpoint_name = os.listdir(last_checkpoint_path)[1]
+                    print(last_checkpoint_name)
+                    last_checkpoint_path = os.path.join(last_checkpoint_path, last_checkpoint_name)
                     break
                 except:
                     if date_offset < -1*(dir_num - 2):
@@ -171,7 +177,7 @@ class CheckpointSaver:
                         date_offset -= 1
 
         # Load state_dict
-        checkpoint = torch.load(top_save_path, map_location=map_location)
+        checkpoint = torch.load(last_checkpoint_path, map_location=map_location)
         model.module.load_state_dict(checkpoint['model'])
         model.train()
         optimizer.load_state_dict(checkpoint['optimizer'])

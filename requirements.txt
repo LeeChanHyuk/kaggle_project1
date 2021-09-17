@@ -12,3 +12,4 @@ nibabel
 SimpleITK
 nilearn
 git+https://github.com/albumentations-team/albumentations
+torchio
