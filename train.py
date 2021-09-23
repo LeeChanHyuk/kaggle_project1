@@ -291,7 +291,7 @@ class Trainer():
 
         # add graph to tensorboard
         if logger is not None:
-            logger.update_graph(model, torch.rand((1,106,192,192)).float())
+            logger.update_graph(model, torch.rand((1,66,192,192)).float())
 
         # load checkpoint
         if self.conf.base.resume == True:
@@ -353,7 +353,7 @@ def runner(rank, conf):
 
 
 
-@hydra.main(config_path='conf', config_name='cmpark')
+@hydra.main(config_path='conf', config_name='mine')
 def main(conf: DictConfig) -> None:
     print(f'Configuration\n{OmegaConf.to_yaml(conf)}')
     

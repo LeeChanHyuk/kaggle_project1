@@ -18,7 +18,7 @@ def create(conf, num_classes=None):
         elif architecture_name == 'M': 
             architecture = create_model("tf_efficientnetv2_m",in_chans=3, num_classes=1)
         # elif architecture_name == 'L': 
-        architecture= create_model("tf_efficientnetv2_l",in_chans=106, num_classes=1)
+        architecture= create_model("tf_efficientnetv2_l",in_chans=66, num_classes=1)
         print(architecture)
         # architecture._conv_stem.in_chans = 40
         # print(architecture,architecture._conv_stem.weight.shape)
