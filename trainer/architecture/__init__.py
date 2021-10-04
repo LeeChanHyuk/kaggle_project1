@@ -18,7 +18,7 @@ def create(conf, num_classes=None):
         elif architecture_name == 'M': 
             architecture = create_model("tf_efficientnetv2_m",in_chans=3, num_classes=1)
         # elif architecture_name == 'L': 
-        architecture= create_model("tf_efficientnetv2_l",in_chans=106, num_classes=1)
+        architecture= create_model("tf_efficientnetv2_l",in_chans=64, num_classes=1)
         print(architecture)
         # architecture._conv_stem.in_chans = 40
         # print(architecture,architecture._conv_stem.weight.shape)
@@ -53,7 +53,7 @@ def create(conf, num_classes=None):
             architecture = torch_models.resnet50(True,{num_classes:1})
         elif architecture_name == '101': 
             architecture = torch_models.resnet101(True,{num_classes:1})
-        architecture.conv1 = nn.Conv2d(106, 64, kernel_size=7, stride=2, padding=3,
+        architecture.conv1 = nn.Conv2d(64, 64, kernel_size=7, stride=2, padding=3,
                             bias=False)
         architecture.fc = nn.Linear(2048,1)
         print(architecture)

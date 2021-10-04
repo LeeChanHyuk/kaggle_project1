@@ -43,110 +43,23 @@ class custom_25d_dataset(torch_data.Dataset):
         self.totensor = ToTensorV2() 
         self.local_rank = local_rank
         self.data=self.load_voxel()
-        #self.data = self.load_data_npy()
         self.channel_length = 0
-        
-        # self.sampling_scheme = {"random": random_stack,
-        #                         "sequential": sequential_stack}[conf["sampling_scheme"]]
-        
         self.sampled_image_paths = self.preload_img_paths()
+
     def __len__(self):
         return len(self.sampled_image_paths)
 
     def channel_length_call(self):
         return self.channel_length
 
-    def load_data_npy(self):
-        if self.local_rank == 0:
-            for partition in range(self.conf['partition']):
-                save_data_path = self.conf['save_data_path']
-                if self.conf['dicom_train'] and os.path.exists(os.path.join(save_data_path, f'dicom_train_data_{partition}.npy')) and os.path.exists(os.path.join(save_data_path, f'dicom_valid_data_{partition}.npy')):
-                    if self.mode == 'train':
-                        data = np.load(os.path.join(save_data_path, f'dicom_train_data_{partition}.npy'))
-                    elif self.mode == 'valid':
-                        data = np.load(os.path.join(save_data_path, f'dicom_valid_data_{partition}.npy'))
-                elif self.conf['dicom_train']==False and os.path.exists(save_data_path, f'normal_train_data_{partition}.npy'):
-                    if self.mode == 'train':
-                        data = np.load(os.path.join(save_data_path, f'normal_train_data_{partition}.npy'))
-                    if self.mode == 'valid':
-                        data = np.load(os.path.join(save_data_path, f'normal_valid_data_{partition}.npy'))
-                else:
-                    data = []
-                    start_index = int((len(self.input_paths) / self.conf['partition']) * partition)
-                    end_index = int((len(self.input_paths) / self.conf['partition']) * (partition + 1))
-                    for i in range(start_index, end_index):
-                        print(f"now = {i}/{len(self.input_paths)}")
-                        if self.conf['dicom_train']:
-                            inputs = self.load_input_from_dicom_files(i)
-                        else:
-                            inputs = self.load_input(i)
-                        data.append(inputs)
-                    data = np.array(data)
-                    if self.conf['dicom_train']:
-                        if self.mode == 'train':
-                            np.save(os.path.join(save_data_path, f'dicom_train_data_{partition}.npy'), data)
-                        elif self.mode == 'valid':
-                            np.save(os.path.join(save_data_path, f'dicom_valid_data_{partition}.npy'), data)
-                    else:
-                        if self.mode == 'train':
-                            np.save(os.path.join(save_data_path, f'normal_train_data_{partition}.npy'), data)
-                        elif self.mode == 'valid':
-                            np.save(os.path.join(save_data_path, f'normal_valid_data_{partition}.npy'), data)
-                if partition == 0:
-                    total_data = np.zeros(data.shape)
-                total_data = np.concatenate((total_data, data), axis=0)
-                
-    def load_data(self):
-        save_data_path = self.conf['save_data_path']
-        if self.conf['dicom_train'] and os.path.exists(os.path.join(save_data_path, 'dicom_train_data.pkl')) and os.path.exists(os.path.join(save_data_path, 'dicom_valid_data.pkl')):
-            if self.mode == 'train':
-                with open(os.path.join(save_data_path,'dicom_train_data.pkl'),'rb') as fr:
-                    data = pickle.load(fr)
-            elif self.mode == 'valid':
-                with open(os.path.join(save_data_path,'dicom_valid_data.pkl'),'rb') as fr:
-                    data = pickle.load(fr)
-        elif self.conf['dicom_train']==False and os.path.exists(save_data_path, 'normal_train_data.pkl'):
-            if self.mode == 'train':
-                with open(os.path.join(save_data_path,'normal_train_data.pkl'),'rb') as fr:
-                    data = pickle.load(fr)
-            if self.mode == 'valid':
-                with open(os.path.join(save_data_path,'normal_valid_data.pkl'),'rb') as fr:
-                    data = pickle.load(fr)
-        else:
-            data = {}
-            for i in range(len(self.input_paths)):
-                print(f"now = {i}/{len(self.input_paths)}")
-                if self.conf['dicom_train']:
-                    inputs = self.load_input_from_dicom_files(i)
-                else:
-                    inputs = self.load_input(i)
-                data[i] = inputs
-            if self.conf['dicom_train']:
-                if self.mode == 'train':
-                    with open(os.path.join(save_data_path,'dicom_train_data.pkl'),'wb') as fw:
-                        pickle.dump(data, fw)
-                elif self.mode == 'valid':
-                    with open(os.path.join(save_data_path,'dicom_valid_data.pkl'),'wb') as fw:
-                        pickle.dump(data, fw)
-            else:
-                if self.mode == 'train':
-                    with open(os.path.join(save_data_path,'normal_train_data.pkl'),'wb') as fw:
-                        pickle.dump(data, fw)
-                elif self.mode == 'valid':
-                    with open(os.path.join(save_data_path,'normal_valid_data.pkl'),'wb') as fw:
-                        pickle.dump(data, fw)
-        return data
-
     def preload_img_paths(self):
         mri_types = self.conf["mri_types"]
-        
         patientes = []
         for imgpath in tqdm(self.input_paths,desc='loading path'): # patient folder
             patient_type = {}
             for j in mri_types:
                 patient_type[j] = glob(f'{imgpath}/{j}/*.png') # patient['FLAIR']에는 patient_folder/image_dict['FLAIR']가 들어가게 됨.
             patientes.append(patient_type)
-            
         return patientes # [patient_folder_index / dict1(about flair), dict2(about t2`w)]
         
 
@@ -157,7 +70,6 @@ class custom_25d_dataset(torch_data.Dataset):
             for mri_type in self.conf['mri_types']:
                 voxel = np.load(os.path.join(path, mri_type + '.npy'))
                 voxels.append(voxel[51:84])
-            #voxels = np.array(voxels)
             new_voxels = np.concatenate((voxels), axis=0)
             patients.append(new_voxels)
         return patients
@@ -204,13 +116,7 @@ class custom_25d_dataset(torch_data.Dataset):
         front = 50
         self.channel_length = end - front + 1
         temp_array = np.concatenate((mri_array[0][:,:,50:114], mri_array[1][:,:,50:114]), axis=2)
-        #final_array = np.concatenate(mri_array, axis=2)
         temp_array = np.transpose(temp_array, (2,0,1))
-        #final_array = []
-        #for i in range(temp_array.shape[0]):
-        #    img = temp_array[i]
-        #    img = self.min_max_normalization(img)
-        #    final_array.append(img)
         final_array = self.min_max_normalization_per_imgs(temp_array)
         final_array = np.array(final_array)
         return final_array

@@ -9,6 +9,8 @@ def create(conf, model):
         optimizer = torch.optim.SGD(model.parameters(), **conf['params'])
     elif conf['type'] == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), **conf['params'])
+    elif conf['type'] == 'adamw':
+        optimizer = torch.optim.Adamw(model.parameters(), **conf['params'])
     else:
         raise AttributeError(f'not support optimizer config: {conf}')
 

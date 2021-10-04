@@ -54,9 +54,6 @@ class Trainer():
         # Hyperparameter
         if self.is_master:
             print(f'[Hyper]: learning_rate: {self.conf.hyperparameter.lr} -> {self.conf.hyperparameter.lr * self.conf.base.world_size}')
-        self.conf.optimizer.params.lr = self.conf.hyperparameter.lr * self.conf.base.world_size
-        self.conf.dataset.train.batch_size =   self.conf.dataset.test.batch_size = self.conf.hyperparameter.batch_size
-        self.conf.dataset.valid.batch_size = self.conf.hyperparameter.batch_size
         # Scheduler
         if self.conf.scheduler.params.get('T_max', None) is None:
             self.conf.scheduler.params.T_max = self.conf.hyperparameter.epochs
@@ -91,7 +88,7 @@ class Trainer():
     # TODO: modulizaing
     def build_dataloader(self, ):
 
-        train_loader, train_sampler, channel_length = trainer.dataset.create(
+        """train_loader, train_sampler, channel_length = trainer.dataset.create(
             self.conf.dataset,
             world_size=self.conf.base.world_size,
             local_rank=self.rank,
@@ -109,10 +106,19 @@ class Trainer():
             world_size=self.conf.base.world_size,
             local_rank=self.rank,
             mode='train'
-        )
+        )"""
+        train_loader, train_sampler = trainer.new_dataset.create(conf = self.conf.dataset,
+        world_size=self.conf.base.world_size,
+        local_rank=self.rank,
+        mode = 'train')
+
+        test_loader, test_sampler = trainer.new_dataset.create(conf = self.conf.dataset,
+        world_size=self.conf.base.world_size,
+        local_rank=self.rank,
+        mode = 'test')
 
 
-        return train_loader, train_sampler, valid_loader, valid_sampler, test_loader, test_sampler, channel_length
+        return train_loader, train_sampler, test_loader, test_sampler
 
     def build_loss(self):
         criterion = trainer.loss.create(self.conf.loss, self.rank)
@@ -278,7 +284,7 @@ class Trainer():
         optimizer = self.build_optimizer(model)
 
         scheduler = self.build_scheduler(optimizer)
-        train_dl, train_sampler,valid_dl,valid_sampler,test_dl,test_sampler, channel_length = self.build_dataloader()
+        train_dl, train_sampler,test_dl, test_sampler= self.build_dataloader()
 
         logger = self.build_looger(is_use=self.is_master)
         saver = self.build_saver(model, optimizer, self.scaler)
@@ -291,7 +297,7 @@ class Trainer():
 
         # add graph to tensorboard
         if logger is not None:
-            logger.update_graph(model, torch.rand((1,106,192,192)).float())
+            logger.update_graph(model, torch.rand((1,64,192,192)).float())
 
         # load checkpoint
         if self.conf.base.resume == True:

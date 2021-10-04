@@ -147,7 +147,7 @@ class CheckpointSaver:
 
         # define the loading path
         if len(os.listdir(self.load_dir)) > 0:
-            top_dir = os.path.join(self.load_dir,self.top_save_path[2:])
+            top_dir = os.path.join(self.load_dir, 'top')
             top_save_path = os.path.join(top_dir, sorted(os.listdir(top_dir))[0])
         else:
             tmp_dir = os.listdir(self.date_path)
@@ -160,8 +160,11 @@ class CheckpointSaver:
             while len(os.listdir(self.date_path))>1:
                 # if the last date folder doesn't have checkpoint
                 try:
-                    last_top_dir = os.path.join(self.date_path,sorted(date_dir)[-2 + date_offset], self.top_save_path[2:])
-                    top_save_path = os.path.join(last_top_dir,sorted(os.listdir(last_top_dir))[0])
+                    last_checkpoint_path = os.path.join(self.date_path,sorted(date_dir)[-2 + date_offset], 'checkpoint')
+                    print('last checkpoint path = ', last_checkpoint_path)
+                    last_checkpoint_name = os.listdir(last_checkpoint_path)[1]
+                    print(last_checkpoint_name)
+                    last_checkpoint_path = os.path.join(last_checkpoint_path, last_checkpoint_name)
                     break
                 except:
                     if date_offset < -1*(dir_num - 2):
@@ -171,7 +174,7 @@ class CheckpointSaver:
                         date_offset -= 1
 
         # Load state_dict
-        checkpoint = torch.load(top_save_path, map_location=map_location)
+        checkpoint = torch.load(last_checkpoint_path, map_location=map_location)
         model.module.load_state_dict(checkpoint['model'])
         model.train()
         optimizer.load_state_dict(checkpoint['optimizer'])
@@ -182,6 +185,7 @@ class CheckpointSaver:
         if checkpoint['metric'] is not None:
             metric = checkpoint['metric']
         return epoch
+
 
     def load_for_inference(self, model, rank):
         # For using DDP
